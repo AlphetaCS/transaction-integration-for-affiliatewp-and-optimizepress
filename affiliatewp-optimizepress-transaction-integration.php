@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: AffiliateWP - OptimizePress Transaction Integration
- * Plugin URI: http://affiliatewp.com
+ * Plugin URI: https://github.com/AlphetaCS/affiliatewp-optimizepress-transaction-integration
  * Description: Integrates AffiliateWP with OptimizePress transactions
  * Author: Brandon Kessell
  * Author URI: http://www.alphetacs.com
