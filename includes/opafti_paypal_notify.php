@@ -2,6 +2,9 @@
 
 // OptimizePress should pass false, then the paypal notification arguments
 function opafti_paypal_notify ($false, $args) {
+	// Delete any expired purchases
+	opafti_delete_expired();
+
 	// Don't proceed if the notification arguments weren't passed
 	if(!$args) {
 		if (WP_DEBUG === true) {
@@ -33,15 +36,40 @@ function opafti_paypal_notify ($false, $args) {
 	$amount = $args["paypal"]["mc_gross"];
 	$description = $args["paypal"]["transaction_subject"];
 	$reference= $args["paypal"]["payer_email"];
+	$payerIpAddress = $args["paypal"]["option_selection2"];
 
-	// If the affiliateId wasn't found, log and return
-	if( empty($affiliateId) || !affiliate_wp()->tracking->is_valid_affiliate($affiliate_id) ) {
-		error_log("opafti_paypal_notify: affiliate id was not found");
+	// If the affiliateId wasn't found using get_affiliate_id(), save to try later
+	if( empty($affiliateId) ) {
+		if(WP_DEBUG === true) {
+			error_log("opafti_paypal_notify: affiliate_wp()->tracking->get_affiliate_id() did not obtain affiliateId, storing in database to try later");
+		}
+
+		// Save purchase
+		opafti_save_purchase($payerIpAddress, $amount, $description, $reference);
 		return;
 	}
 
+	// If the affiliateId wasn't found, log and return
+	if( empty($affiliateId) ) {
+		if(WP_DEBUG === true) {
+			error_log("opafti_paypal_notify: affiliate id was not found");
+		}
+		return;
+	}
+
+	// If the affiliateId isn't valid, log and return
+	if( !affiliate_wp()->tracking->is_valid_affiliate($affiliate_id) ) {
+		if(WP_DEBUG === true) {
+			error_log("opafti_paypal_notify: affiliate id was not valid");
+		}
+		return;
+	}
+
+	// Get the visit id
+	$visitId = affiliate_wp()->tracking->get_visit_id();
+
 	// Call the function that adds the referral
-	opafti_add_referral($affiliateId, $amount, $description, $reference, "");
+	opafti_add_referral($affiliateId, $amount, $description, $reference, "", $visitId);
 }
 
 // Add opafti_paypal_notify to the OptimizePress paypal processing hook
