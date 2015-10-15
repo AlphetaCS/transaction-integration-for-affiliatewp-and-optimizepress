@@ -1,4 +1,4 @@
-=== AffiliateWP - OptimizePress Transaction Integration ===
+=== Transaction Integration for AffiliateWP and OptimizePress ===
 Contributors: bkessell
 Donate link: http://bit.ly/1OCXl94
 Tags: AffiliateWP, OptimizePress, PayPal, Integration, OPAFTI
