@@ -12,7 +12,7 @@ This WordPress plugin attempts to link OptimizePress purchases to an AffiliateWP
 
 == Description ==
 
-AffiliateWP - OptimizePress Transaction Integration attempts to link OptimizePress purchases to an AffiliateWP ID based on IP address and cookie values. This plugin requires OptimizeMember and AffiliateWP plugins and functions as an intermediate linker between them.
+Transaction Integration for AffiliateWP and OptimizePress attempts to link OptimizePress purchases to an AffiliateWP ID based on IP address and cookie values. This plugin requires OptimizeMember and AffiliateWP plugins and functions as an intermediate linker between them.
 
 == Installation ==
 
