@@ -1,4 +1,4 @@
-# affiliatewp-optimizepress-transaction-integration
+# transaction-integration-for-affiliatewp-and-optimizepress
 Wordpress Plugin to Integrate AffiliateWP with OptimizePress Transactions
 This WordPress plugin attempts to link OptimizePress purchases to an AffiliateWP ID using the following strategy
  - A purchase is made in OptimizePresss
