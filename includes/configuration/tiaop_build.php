@@ -15,9 +15,6 @@ function tiaop_custom_admin_menu() {
 }
 
 function tiaop_register_settings() {
-	// License
-	register_setting("tiaop-license", "tiaop_license_key");
-
 	// Expiration
 	register_setting("tiaop-settings", "tiaop_expiration_value");
 	register_setting("tiaop-settings", "tiaop_expiration_units");

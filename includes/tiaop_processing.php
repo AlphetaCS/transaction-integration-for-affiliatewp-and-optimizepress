@@ -32,7 +32,7 @@ function tiaop_add_referral($affiliateId, $amount = "", $description = "", $refe
 
 	// Update the visit info
 	if(!$is_test)
-		affiliate_wp()->visits->update( $visitId, array( "referral_id" => $referralId), "", "visit");
+		affiliate_wp()->visits->update($visitId, array( "referral_id" => $referralId), "", "visit");
 }
 
 function tiaop_process_saved_purchases($is_test = false) {
@@ -41,8 +41,8 @@ function tiaop_process_saved_purchases($is_test = false) {
 		$affiliateId = 1;
 	else
 		$affiliateId = affiliate_wp()->tracking->get_affiliate_id();
-	
-	if( empty($affiliateId))
+
+	if(empty($affiliateId))
 		return;
 
 	// Check the database for saved purchases
@@ -72,6 +72,10 @@ function tiaop_process_saved_purchases($is_test = false) {
 
 	// Log the link
 	tiaop_add_history(tiaop_get_user_ip(), $amount, $description, $reference, $expiration, "Visit ID " . $visitId . " linked to Affiliate ID " . $affiliateId, $is_test);
+
+	// Update the conversion stats
+	if(!is_test)
+		tiaop_increment_ac($amount);
 
 	// Delete this entry now that it was processed
 	tiaop_delete_current_ip();

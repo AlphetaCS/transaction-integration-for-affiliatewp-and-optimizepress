@@ -5,7 +5,7 @@
  * Description: Integrates AffiliateWP with OptimizePress transactions
  * Author: Brandon Kessell
  * Author URI: http://www.alphetacs.com
- * Version: 2.0
+ * Version: 2.1
  */
 
 // Define constants

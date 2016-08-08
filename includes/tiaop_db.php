@@ -68,6 +68,26 @@ function tiaop_create_history_table() {
 	}
 }
 
+function tiaop_create_stats_table() {
+	global $wpdb;
+	$db_table_name = $wpdb->prefix . "opafti_stats";
+	$charset_collate = $wpdb->get_charset_collate();
+
+	$sql =	"CREATE TABLE $db_table_name
+			(	hrd_count integer,
+				as_count integer,
+				ac_count integer,
+				act_amount float(7,2),
+				last_ac datetime,
+				last_hrd datetime ) $charset_collate;";
+
+	if($wpdb->get_var("SHOW TABLES LIKE '$db_table_name'") != $db_table_name) {
+		require_once(ABSPATH . "wp-admin/includes/upgrade.php");
+		dbDelta($sql);
+		$wpdb->insert($db_table_name, array("hrd_count" => 0, "as_count" => 0, "ac_count" => 0, "act_amount" => 0.00));
+	}
+}
+
 function tiaop_add_history($payerIpAddress, $amount, $description, $reference, $expireTime, $action, $isTest = false) {
 	global $wpdb;
 	$db_table_name = $wpdb->prefix . "opafti_history";
@@ -103,7 +123,43 @@ function tiaop_purge_history() {
 		$deleteSql = $deleteSql . " WHERE logged_at < date_sub(now(), INTERVAL " . $retain_history_value . " " . $rh_expiration_units . ")";
 
 	// Run delete
-	$wpdb->query($deleteSql);
+	$deletedCount = $wpdb->query($deleteSql);
+
+	// Update stats table
+	tiaop_increment_hrd_count($deletedCount);
+}
+
+function tiaop_increment_ac($amount) {
+	global $wpdb;
+	$db_table_name = $wpdb->prefix . "opafti_stats";
+
+	// Build the update
+	$updateSql = "UPDATE $db_table_name SET ac_count = ac_count + 1, act_amount = act_amount + $amount, last_ac = (SELECT NOW())";
+
+	// Run the update
+	$wpdb->query($updateSql);
+}
+
+function tiaop_increment_as() {
+	global $wpdb;
+	$db_table_name = $wpdb->prefix . "opafti_stats";
+
+	// Build the update
+	$updateSql = "UPDATE $db_table_name SET as_count = as_count + 1";
+
+	// Run the update
+	$wpdb->query($updateSql);
+}
+
+function tiaop_increment_hrd_count($incrementBy) {
+	global $wpdb;
+	$db_table_name = $wpdb->prefix . "opafti_stats";
+
+	// Build the update
+	$updateSql = "UPDATE $db_table_name SET hrd_count = hrd_count + $incrementBy, last_hrd = (SELECT NOW())";
+
+	// Run the update
+	$wpdb->query($updateSql);
 }
 
 function tiaop_save_purchase($payerIpAddress, $amount, $description, $reference, $is_test = false) {
@@ -124,6 +180,17 @@ function tiaop_save_purchase($payerIpAddress, $amount, $description, $reference,
 	// Save the purchase info
 	tiaop_delete_ip($payerIpAddress);
 	$wpdb->insert($db_table_name, array("ip_address" => $payerIpAddress, "amount" => $amount, "description" => $description, "reference" => $reference, "expires" => $expires));
+
+	// Increment Affiliate Saved
+	//if(!$is_test)
+		tiaop_increment_as();
+}
+
+function tiaop_get_stats() {
+	global $wpdb;
+	$db_table_name = $wpdb->prefix . "opafti_stats";
+
+	return $wpdb->get_row("SELECT * FROM " . $db_table_name, ARRAY_N);
 }
 
 function tiaop_get_saved_purchase() {
@@ -172,6 +239,7 @@ function tiaop_delete_expired() {
 function tiaop_create_db_tables() {
 	tiaop_create_saved_purchase_table();
 	tiaop_create_history_table();
+	tiaop_create_stats_table();
 }
 
 ?>
